@@ -66,7 +66,7 @@ export function ItemCard({
           {item.name}
         </h3>
         <p className="text-lg font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1 mb-3">
-          <DollarSign className="w-4 h-4" />
+          <i className='mr-1'>₦</i>
           {item.price.toLocaleString()}
         </p>
 

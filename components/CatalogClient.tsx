@@ -39,7 +39,7 @@ export default function CatalogClient({
   const { favourites, toggleFavourite } = useFavourites(userId);
 
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME || "My Catalog";
-  const whatsappNumber = process.env.WHATSAPP_NUMBER || "1234567890";
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 
   useEffect(() => {
     const fetchData = async () => {

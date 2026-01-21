@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   X,
+  Tag,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -51,6 +52,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Items", href: "/admin/items", icon: Package },
+    { name: "Categories", href: "/admin/categories", icon: Tag },
     { name: "Insights", href: "/admin/insights", icon: BarChart3 },
   ];
 

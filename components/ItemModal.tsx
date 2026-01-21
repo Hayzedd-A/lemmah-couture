@@ -1,9 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { X, Heart, MessageCircle, ChevronLeft, ChevronRight, DollarSign } from 'lucide-react';
-import { Item } from './CatalogClient';
+import { useState } from "react";
+import Image from "next/image";
+import {
+  X,
+  Heart,
+  MessageCircle,
+  ChevronLeft,
+  ChevronRight,
+  DollarSign,
+} from "lucide-react";
+import { Item } from "./CatalogClient";
 
 interface ItemModalProps {
   item: {
@@ -21,13 +28,13 @@ interface ItemModalProps {
   onWhatsApp: (item: Item) => void;
 }
 
-export function ItemModal({ 
-  item, 
-  isOpen, 
-  isFavourite, 
-  onClose, 
+export function ItemModal({
+  item,
+  isOpen,
+  isFavourite,
+  onClose,
   onFavouriteToggle,
-  onWhatsApp 
+  onWhatsApp,
 }: ItemModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -46,11 +53,11 @@ export function ItemModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div 
+      <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      
+
       <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden">
         <button
           onClick={onClose}
@@ -69,7 +76,7 @@ export function ItemModal({
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, 500px"
               />
-              
+
               {hasMultipleImages && (
                 <>
                   <button
@@ -84,16 +91,16 @@ export function ItemModal({
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
-                  
+
                   <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                     {images.map((_, index) => (
                       <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
                         className={`w-2 h-2 rounded-full transition-colors ${
-                          index === currentImageIndex 
-                            ? 'bg-white' 
-                            : 'bg-white/50 hover:bg-white/75'
+                          index === currentImageIndex
+                            ? "bg-white"
+                            : "bg-white/50 hover:bg-white/75"
                         }`}
                       />
                     ))}
@@ -112,16 +119,17 @@ export function ItemModal({
           <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-medium rounded mb-2">
             {item.category}
           </span>
-          
+
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             {item.name}
           </h2>
-          
+
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1 mb-4">
-            <DollarSign className="w-5 h-5" />
+            <i className="mr-1">₦</i>
+
             {item.price.toLocaleString()}
           </p>
-          
+
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
             {item.description}
           </p>
@@ -132,14 +140,14 @@ export function ItemModal({
             onClick={() => onFavouriteToggle(item._id)}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-colors ${
               isFavourite
-                ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
-            <Heart className={`w-5 h-5 ${isFavourite ? 'fill-current' : ''}`} />
-            {isFavourite ? 'Favourited' : 'Favourite'}
+            <Heart className={`w-5 h-5 ${isFavourite ? "fill-current" : ""}`} />
+            {isFavourite ? "Favourited" : "Favourite"}
           </button>
-          
+
           <button
             onClick={() => onWhatsApp(item)}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors"
@@ -152,4 +160,3 @@ export function ItemModal({
     </div>
   );
 }
-
