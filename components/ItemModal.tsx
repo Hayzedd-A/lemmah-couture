@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { X, Heart, MessageCircle, ChevronLeft, ChevronRight, DollarSign } from 'lucide-react';
+import { Item } from './CatalogClient';
 
 interface ItemModalProps {
   item: {
@@ -17,7 +18,7 @@ interface ItemModalProps {
   isFavourite: boolean;
   onClose: () => void;
   onFavouriteToggle: (itemId: string) => void;
-  onWhatsApp: (item: unknown) => void;
+  onWhatsApp: (item: Item) => void;
 }
 
 export function ItemModal({ 
@@ -58,7 +59,7 @@ export function ItemModal({
           <X className="w-5 h-5" />
         </button>
 
-        <div className="relative aspect-[4/3] bg-gray-100 dark:bg-gray-800">
+        <div className="relative aspect-4/3 bg-gray-100 dark:bg-gray-800">
           {images.length > 0 ? (
             <>
               <Image

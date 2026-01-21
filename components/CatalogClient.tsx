@@ -1,47 +1,54 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { Header } from '@/components/Header';
-import { CategoryTabs } from '@/components/CategoryTabs';
-import { ItemCard } from '@/components/ItemCard';
-import { ItemModal } from '@/components/ItemModal';
-import { useAnonymousUser, useFavourites } from '@/hooks/useAnonymousUser';
+import { useState, useEffect, useMemo } from "react";
+import { Header } from "@/components/Header";
+import { CategoryTabs } from "@/components/CategoryTabs";
+import { ItemCard } from "@/components/ItemCard";
+import { ItemModal } from "@/components/ItemModal";
+import { useAnonymousUser, useFavourites } from "@/hooks/useAnonymousUser";
+
+export interface Item {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  images: string[];
+  category: string;
+}
 
 interface CatalogClientProps {
-  items: Array<{
-    _id: string;
-    name: string;
-    description: string;
-    price: number;
-    images: string[];
-    category: string;
-  }>;
+  items: Array<Item>;
   categories: string[];
 }
 
-export default function CatalogClient({ items: initialItems, categories: initialCategories }: CatalogClientProps) {
+export default function CatalogClient({
+  items: initialItems,
+  categories: initialCategories,
+}: CatalogClientProps) {
   const [items, setItems] = useState(initialItems);
   const [categories, setCategories] = useState(initialCategories);
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedItem, setSelectedItem] = useState<typeof initialItems[0] | null>(null);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedItem, setSelectedItem] = useState<
+    (typeof initialItems)[0] | null
+  >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const userId = useAnonymousUser();
   const { favourites, toggleFavourite } = useFavourites(userId);
 
-  const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME || 'My Catalog';
-  const whatsappNumber = process.env.WHATSAPP_NUMBER || '1234567890';
+  const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME || "My Catalog";
+  const whatsappNumber = process.env.WHATSAPP_NUMBER || "1234567890";
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [itemsRes, categoriesRes] = await Promise.all([
-          fetch('/api/items'),
-          fetch('/api/categories'),
+          fetch("/api/items"),
+          fetch("/api/categories"),
         ]);
-        
+
         if (itemsRes.ok) {
           const data = await itemsRes.json();
           setItems(data.items);
@@ -51,7 +58,7 @@ export default function CatalogClient({ items: initialItems, categories: initial
           setCategories(data.categories);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -62,23 +69,24 @@ export default function CatalogClient({ items: initialItems, categories: initial
     let filtered = items;
 
     // Filter by category
-    if (activeCategory !== 'all') {
-      filtered = filtered.filter(item => item.category === activeCategory);
+    if (activeCategory !== "all") {
+      filtered = filtered.filter((item) => item.category === activeCategory);
     }
 
     // Filter by search
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(item => 
-        item.name.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (item) =>
+          item.name.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query),
       );
     }
 
     return filtered;
   }, [items, activeCategory, searchQuery]);
 
-  const handleItemClick = (item: typeof items[0]) => {
+  const handleItemClick = (item: Item) => {
     setSelectedItem(item);
     setIsModalOpen(true);
   };
@@ -92,10 +100,10 @@ export default function CatalogClient({ items: initialItems, categories: initial
     await toggleFavourite(itemId);
   };
 
-  const handleWhatsApp = (item: typeof items[0]) => {
-    const message = `Hi, I found interest in this item: ${item.name}\n${item.images[0] || ''}`;
+  const handleWhatsApp = (item: Item) => {
+    const message = `Hi, I found interest in this item: ${item.name}\n${item.images[0] || ""}`;
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    window.open(whatsappUrl, "_blank");
   };
 
   return (
@@ -106,7 +114,7 @@ export default function CatalogClient({ items: initialItems, categories: initial
         onSearchChange={setSearchQuery}
         onFavouritesClick={() => {
           // Show user's favourites or filter items
-          setSearchQuery('favorites:');
+          setSearchQuery("favorites:");
         }}
       />
 
@@ -124,7 +132,7 @@ export default function CatalogClient({ items: initialItems, categories: initial
         ) : filteredItems.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">
-              {searchQuery ? 'No items found' : 'No items available'}
+              {searchQuery ? "No items found" : "No items available"}
             </p>
           </div>
         ) : (
@@ -154,4 +162,3 @@ export default function CatalogClient({ items: initialItems, categories: initial
     </div>
   );
 }
-

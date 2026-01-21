@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -23,8 +24,12 @@ export function useAnonymousUser() {
   return userId;
 }
 
+interface FavouriteItem {
+  itemId: { _id: string };
+}
+
 export function useFavourites(userId: string) {
-  const [favourites, setFavourites] = useState<Set<string>>(new Set());
+  const [favourites, setFavourites] = useState<Set<string>>(new Set<string>());
 
   const syncFavourites = useCallback(async () => {
     if (!userId) return;
@@ -34,8 +39,8 @@ export function useFavourites(userId: string) {
       const data = await response.json();
       
       if (data.favourites) {
-        const favouriteIds = new Set(
-          data.favourites.map((f: { itemId: { _id: string } }) => f.itemId._id)
+        const favouriteIds = new Set<string>(
+          data.favourites.map((f: FavouriteItem) => f.itemId._id)
         );
         setFavourites(favouriteIds);
       }
@@ -65,7 +70,7 @@ export function useFavourites(userId: string) {
           const next = new Set(prev);
           next.delete(itemId);
           return next;
-        }));
+        });
       }
 
       return data.favourited;

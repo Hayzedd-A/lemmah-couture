@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Heart, MessageCircle, DollarSign } from 'lucide-react';
+import { Item } from './CatalogClient';
 
 interface ItemCardProps {
   item: {
@@ -14,8 +15,8 @@ interface ItemCardProps {
   };
   isFavourite: boolean;
   onFavouriteToggle: (itemId: string) => void;
-  onWhatsApp: (item: unknown) => void;
-  onClick: (item: unknown) => void;
+  onWhatsApp: (item: Item) => void;
+  onClick: (item: Item) => void;
 }
 
 export function ItemCard({ 
