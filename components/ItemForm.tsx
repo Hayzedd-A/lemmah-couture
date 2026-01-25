@@ -82,6 +82,9 @@ export function ItemForm({
       let uploadedMedia: { url: string; type: "image" | "video" }[] = [];
 
       console.log("Processing media preview:", mediaPreviews);
+      if (mediaPreviews.length === 0) {
+        throw new Error("Please add at least one image or video.");
+      }
       const uploadFormData = new FormData();
       for (const preview of mediaPreviews)
         uploadFormData.append("file", preview.file);
@@ -106,9 +109,9 @@ export function ItemForm({
         media: uploadedMedia,
         category: newCategory || formData.category || "all",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting form:", error);
-      alert("Failed to upload media. Please try again.");
+      alert( error.message || "Failed to upload media. Please try again.");
       setIsUploading(false);
     }
   };
@@ -206,13 +209,15 @@ export function ItemForm({
             Price
           </label>
           <input
-            type="number"
+            type="string"
             value={formData.price}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                price: parseFloat(e.target.value) || 0,
-              }))
+            onChange={(e) => {
+              const valid = !(isNaN(parseFloat(e.target.value)));
+                setFormData((prev) => ({
+                  ...prev,
+                  price: valid ? parseFloat(e.target.value).toLocaleString() as unknown as number : 0,
+                }))
+              }
             }
             min={0}
             step={0.01}
