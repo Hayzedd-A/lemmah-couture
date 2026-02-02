@@ -181,7 +181,7 @@ export default async function ItemPage({ params }: PageProps) {
 
             {/* Action Buttons */}
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-              <WhatsAppButton itemName={item.name} price={item.price} />
+              <WhatsAppButton slug={item.slug} itemName={item.name} price={item.price} />
             </div>
 
             {/* Item Meta Info */}

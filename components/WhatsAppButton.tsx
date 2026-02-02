@@ -1,21 +1,25 @@
-'use client';
+"use client";
 
-import { MessageCircle } from 'lucide-react';
+import { getShareUrl } from "@/lib/util";
+import { MessageCircle } from "lucide-react";
+const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME || "My Catalog";
 
 interface WhatsAppButtonProps {
   itemName: string;
   price: number;
+  slug: string;
 }
 
-export function WhatsAppButton({ itemName, price }: WhatsAppButtonProps) {
+export function WhatsAppButton({ itemName, price, slug }: WhatsAppButtonProps) {
   const formatPrice = (price: number) => {
     return `₦${price.toLocaleString()}`;
   };
 
   const handleWhatsApp = () => {
-    const message = `Hi, I'm interested in the ${itemName} (${formatPrice(price)}) from Lemmah Couture. Is it still available?`;
-    const whatsappUrl = `https://wa.me/2348100000000?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    const message = `Hi, I found interest in this item: ${itemName}\n\n${getShareUrl(slug) || ""}`;
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
   };
 
   return (
@@ -28,4 +32,3 @@ export function WhatsAppButton({ itemName, price }: WhatsAppButtonProps) {
     </button>
   );
 }
-
