@@ -1,14 +1,17 @@
-import { connectToDatabase } from '@/lib/mongodb';
-import { Item } from '@/models/Item';
-import CatalogClient from '@/components/CatalogClient';
+import { connectToDatabase } from "@/lib/mongodb";
+import { Item } from "@/models/Item";
+import CatalogClient from "@/components/CatalogClient";
 
 async function getItems() {
   try {
     await connectToDatabase();
     const items = await Item.find().sort({ createdAt: -1 });
-    return items.map(item => ({...item.toObject(), _id: item._id.toString()}));
+    return items.map((item) => ({
+      ...item.toObject(),
+      _id: item._id.toString(),
+    }));
   } catch (error) {
-    console.error('Error fetching items:', error);
+    console.error("Error fetching items:", error);
     return [];
   }
 }
@@ -16,21 +19,18 @@ async function getItems() {
 async function getCategories() {
   try {
     await connectToDatabase();
-    const categories = await Item.distinct('category');
+    const categories = await Item.distinct("category");
     return categories;
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    console.error("Error fetching categories:", error);
     return [];
   }
 }
 
 export default async function Home() {
-  const [items, categories] = await Promise.all([getItems(), getCategories()]);
-  
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <CatalogClient items={items} categories={categories} />
+      <CatalogClient />
     </main>
   );
 }
-

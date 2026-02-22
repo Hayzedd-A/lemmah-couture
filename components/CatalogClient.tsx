@@ -8,25 +8,21 @@ import { ItemModal } from "@/components/ItemModal";
 import { useAnonymousUser, useFavourites } from "@/hooks/useAnonymousUser";
 import { getShareUrl } from "@/lib/util";
 import { ItemProps } from "@/app/types";
+import { Loader2 } from "lucide-react";
 
 interface CatalogClientProps {
-  items: Array<ItemProps>;
-  categories: string[];
+  getItems: () => Promise<Array<ItemProps>>;
+  getCategories: () => Promise<string[]>;
 }
 
-export default function CatalogClient({
-  items: initialItems,
-  categories: initialCategories,
-}: CatalogClientProps) {
-  const [items, setItems] = useState(initialItems);
-  const [categories, setCategories] = useState(initialCategories);
+export default function CatalogClient() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [items, setItems] = useState<Array<ItemProps>>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedItem, setSelectedItem] = useState<
-    (typeof initialItems)[0] | null
-  >(null);
+  const [selectedItem, setSelectedItem] = useState<ItemProps | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const userId = useAnonymousUser();
   const { favourites, toggleFavourite } = useFavourites(userId);
@@ -37,6 +33,7 @@ export default function CatalogClient({
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const [itemsRes, categoriesRes] = await Promise.all([
           fetch("/api/items"),
           fetch("/api/categories"),
@@ -52,6 +49,8 @@ export default function CatalogClient({
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -124,7 +123,8 @@ export default function CatalogClient({
       <main className="px-4 py-6">
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <Loader2 className="animate-spin h-8 w-8 text-white" />
+            <p className="text-gray-500 dark:text-gray-400">Loading...</p>
           </div>
         ) : filteredItems.length === 0 ? (
           <div className="text-center py-12">
