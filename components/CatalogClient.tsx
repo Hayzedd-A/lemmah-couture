@@ -97,7 +97,10 @@ export default function CatalogClient() {
   };
 
   const handleWhatsApp = (item: ItemProps) => {
-    const message = `Hi, I found interest in this item: ${item.name}\n\n${getShareUrl(item.slug) || ""}`;
+    const formatPrice = (price: number) => {
+      return `₦${price.toLocaleString()}`;
+    };
+    const message = `Hi, I found interest in this item: ${item.name} - (${formatPrice(item.price)}) \n\n${getShareUrl(item.slug) || ""}`;
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
