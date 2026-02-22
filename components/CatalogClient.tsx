@@ -125,8 +125,8 @@ export default function CatalogClient() {
 
       <main className="px-4 py-6">
         {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="animate-spin h-8 w-8 text-white" />
+          <div className="flex gap-2 justify-center items-center py-12">
+            <Loader2 className="animate-spin h-8 w-8 text-gray-500 dark:text-gray-400" />
             <p className="text-gray-500 dark:text-gray-400">Loading...</p>
           </div>
         ) : filteredItems.length === 0 ? (
