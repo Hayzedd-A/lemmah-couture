@@ -1,16 +1,55 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Item } from "@/models/Item";
+import { Favourite } from "@/models/Favourite";
 import { generateSlug } from "@/lib/util";
+import type { PipelineStage } from "mongoose";
+
+type SortField = "price" | "latest" | "likes";
+type SortOrder = "asc" | "desc";
 
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
+    const sort = (searchParams.get("sort") as SortField) || "latest";
+    const order = (searchParams.get("order") as SortOrder) || "desc";
 
-    const query = category && category !== "all" ? { category } : {};
-    const items = await Item.find(query).sort({ createdAt: -1 }).lean();
+    const orderVal = order === "asc" ? 1 : -1;
+
+    const matchStage =
+      category && category !== "all" ? { $match: { category } } : { $match: {} };
+
+    // Determine sort field for the pipeline
+    let sortStage: PipelineStage;
+    if (sort === "likes") {
+      sortStage = { $sort: { favouriteCount: orderVal, createdAt: -1 } };
+    } else if (sort === "price") {
+      sortStage = { $sort: { price: orderVal } };
+    } else {
+      // latest
+      sortStage = { $sort: { createdAt: orderVal } };
+    }
+
+    const items = await Item.aggregate([
+      matchStage,
+      {
+        $lookup: {
+          from: Favourite.collection.name,
+          localField: "_id",
+          foreignField: "itemId",
+          as: "favourites",
+        },
+      },
+      {
+        $addFields: {
+          favouriteCount: { $size: "$favourites" },
+        },
+      },
+      { $unset: "favourites" },
+      sortStage,
+    ]);
 
     return NextResponse.json({ items });
   } catch (error) {

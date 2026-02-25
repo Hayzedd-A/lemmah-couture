@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface CategoryTabsProps {
   categories: string[];
@@ -6,10 +6,10 @@ interface CategoryTabsProps {
   onCategoryChange: (category: string) => void;
 }
 
-export function CategoryTabs({ 
-  categories, 
-  activeCategory, 
-  onCategoryChange 
+export function CategoryTabs({
+  categories,
+  activeCategory,
+  onCategoryChange,
 }: CategoryTabsProps) {
   return (
     <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide border-b border-gray-200 dark:border-gray-700">
@@ -29,8 +29,8 @@ export function CategoryTabs({
           onClick={() => onCategoryChange(category)}
           className={`px-4 py-2 rounded-full text-sm font-medium capitalize whitespace-nowrap transition-colors ${
             activeCategory === category
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+              ? "bg-blue-600 text-white"
+              : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
           }`}
         >
           {category}
@@ -39,4 +39,3 @@ export function CategoryTabs({
     </div>
   );
 }
-

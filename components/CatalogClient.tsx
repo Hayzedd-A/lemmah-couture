@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Header } from "@/components/Header";
+import { Header, SortField, SortOrder } from "@/components/Header";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { ItemCard } from "@/components/ItemCard";
 import { ItemModal } from "@/components/ItemModal";
@@ -9,11 +9,6 @@ import { useAnonymousUser, useFavourites } from "@/hooks/useAnonymousUser";
 import { getShareUrl } from "@/lib/util";
 import { ItemProps } from "@/app/types";
 import { Loader2 } from "lucide-react";
-
-interface CatalogClientProps {
-  getItems: () => Promise<Array<ItemProps>>;
-  getCategories: () => Promise<string[]>;
-}
 
 export default function CatalogClient() {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,6 +18,8 @@ export default function CatalogClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<ItemProps | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortField, setSortField] = useState<SortField>("latest");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
   const userId = useAnonymousUser();
   const { favourites, toggleFavourite } = useFavourites(userId);
@@ -34,8 +31,12 @@ export default function CatalogClient() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
+        const params = new URLSearchParams({
+          sort: sortField,
+          order: sortOrder,
+        });
         const [itemsRes, categoriesRes] = await Promise.all([
-          fetch("/api/items"),
+          fetch(`/api/items?${params.toString()}`),
           fetch("/api/categories"),
         ]);
 
@@ -45,7 +46,10 @@ export default function CatalogClient() {
         }
         if (categoriesRes.ok) {
           const data = await categoriesRes.json();
-          setCategories([...data.categories, "Favourites"]);
+          setCategories([
+            ...data.categories,
+            `Favourites (${favourites.size})`,
+          ]);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -55,17 +59,31 @@ export default function CatalogClient() {
     };
 
     fetchData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortField, sortOrder]);
+
+  useEffect(() => {
+    setCategories((prev) => {
+      const updatedCategories = [...prev];
+      const favouritesIndex = updatedCategories.findIndex((cat) =>
+        cat.startsWith("Favourites"),
+      );
+      if (favouritesIndex !== -1) {
+        updatedCategories[favouritesIndex] = `Favourites (${favourites.size})`;
+      }
+      return updatedCategories;
+    });
+  }, [favourites]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
 
     // Filter by category
-    if (activeCategory !== "all" && activeCategory !== "Favourites") {
+    if (activeCategory !== "all" && !activeCategory.includes("Favourites")) {
       filtered = filtered.filter((item) => item.category === activeCategory);
     }
 
-    if (activeCategory === "Favourites") {
+    if (activeCategory.includes("Favourites")) {
       filtered = filtered.filter((item) => favourites.has(item._id));
     }
 
@@ -80,7 +98,12 @@ export default function CatalogClient() {
     }
 
     return filtered;
-  }, [items, activeCategory, searchQuery]);
+  }, [items, activeCategory, searchQuery, favourites]);
+
+  const handleSortChange = (field: SortField, order: SortOrder) => {
+    setSortField(field);
+    setSortOrder(order);
+  };
 
   const handleItemClick = (item: ItemProps) => {
     setSelectedItem(item);
@@ -111,10 +134,13 @@ export default function CatalogClient() {
         businessName={businessName}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        favouriteCount={favourites.size}
         onFavouritesClick={() => {
-          // Show user's favourites or filter items
           setActiveCategory("Favourites");
         }}
+        sortField={sortField}
+        sortOrder={sortOrder}
+        onSortChange={handleSortChange}
       />
 
       <CategoryTabs
